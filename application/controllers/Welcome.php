@@ -20,7 +20,27 @@ class Welcome extends Application {
      * @see http://codeigniter.com/user_guide/general/urls.html
      */
     public function index() {
-        $this->data['pagebody'] = 'welcome'; 
+        //gets 3 newest images
+        $pix = $this->images->newest();
+        
+        //build array of formatted cells for them
+        foreach ($pix as $picture)
+            $cells[] = $this->parser->parse('_cell', (array)$picture, true);
+        
+        //prime the table class
+        $this->load->library('table');
+        $parms = array(
+            'table_open' =>'<table class="gallery">',
+            'cell_start' =>'<td class="oneimage">',
+            'cell_alt_start' => '<td class="oneimage">'
+        );
+        $this->table->set_template($parms);
+        
+        //generate the table finally!
+        $rows = $this->table->make_columns($cells, 3);
+        $this->data['thetable'] = $this->table->generate($rows);
+        
+        $this->data['pagebody'] = 'welcome';
         $this->render();
     }
 
